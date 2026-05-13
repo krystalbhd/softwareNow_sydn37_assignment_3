@@ -469,7 +469,13 @@ class SpotTheDifferenceApp:
                 width=12, relief="solid", borderwidth=1
             ).pack(pady=20)
 
-
+# RUN APPLICATION
+# Entry point — creates the main window and starts the app
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = SpotTheDifferenceApp(root)
+    root.mainloop()
+    
 
     
 
