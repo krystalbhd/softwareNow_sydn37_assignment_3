@@ -104,3 +104,68 @@ class Difference:
             and
             y - tolerance <= click_y <= y + h + tolerance
         )
+
+# ||IMAGE PROCESSOR||
+
+class ImageProcessor:
+    def __init__(self):
+        # Stores the original unmodified image
+        self.original_image = None
+        # Stores the image with effects applied
+        self.modified_image = None
+        # List of Difference objects placed on the image
+        self.differences = []
+        # Available effects to randomly assign to differences
+        self.effects = [
+            ColorShiftEffect(),
+            BlurEffect(),
+            InvertEffect()
+        ]
+
+    # To load an image from the given file path
+    def load_image(self, path):
+        image = cv2.imread(path)
+        if image is None:
+            return
+        # Keep the original image unchanged
+        self.original_image = image.copy()
+        # Modified image will receive the applied effects
+        self.modified_image = image.copy()
+        # Clear any previous differences
+        self.differences = []
+
+    # To randomly generate 5 non-overlapping difference regions
+    def generate_differences(self):
+        height, width = self.original_image.shape[:2]
+        while len(self.differences) < 5:
+            # Random size between 40 and 80 pixels
+            size = random.randint(40, 80)
+            # Random position within image bounds
+            x = random.randint(0, width - size)
+            y = random.randint(0, height - size)
+            # Randomly select an effect to apply
+            effect = random.choice(self.effects)
+            difference = Difference(x, y, size, size, effect)
+            # Skip this region if it overlaps with an existing one
+            if self.overlaps(difference):
+                continue
+            self.differences.append(difference)
+            # Apply the effect only to the modified image
+            effect.apply(self.modified_image, x, y, size, size)
+
+    # To check if a new difference overlaps with any existing ones
+    def overlaps(self, new_difference):
+        nx, ny, nw, nh = new_difference.rect()
+        for difference in self.differences:
+            x, y, w, h = difference.rect()
+            overlap = not (
+                nx + nw < x or
+                nx > x + w or
+                ny + nh < y or
+                ny > y + h
+            )
+            if overlap:
+                return True
+        return False
+    
+
