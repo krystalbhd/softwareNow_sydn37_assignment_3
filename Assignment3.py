@@ -447,7 +447,29 @@ class SpotTheDifferenceApp:
             self.mistake_label.config(text=f"Mistakes: {self.state.mistakes}/3")
             self.total_score_label.config(text=f"Total Score: {self.state.total_found}")
 
-    
+    # Displays a centred popup window with a title, message and OK button
+    def show_popup(self, title, message, color):
+            popup = tk.Toplevel(self.root)
+            popup.title(title)
+            popup.geometry("340x200")
+            popup.configure(bg="white")
+            popup.resizable(False, False)
+            popup.grab_set()
+            popup.update_idletasks()
+            # Centre the popup on the screen
+            x = (popup.winfo_screenwidth() // 2) - 170
+            y = (popup.winfo_screenheight() // 2) - 100
+            popup.geometry(f"340x200+{x}+{y}")
+            tk.Label(popup, text=title, bg="white", fg=color, font=("Arial", 16, "bold")).pack(pady=(25, 10))
+            tk.Label(popup, text=message, bg="white", fg="black", font=("Arial", 11)).pack(pady=5)
+            tk.Button(
+                popup, text="OK", command=popup.destroy,
+                bg="white", fg="black", activebackground="#dddddd",
+                activeforeground="black", font=("Arial", 10, "bold"),
+                width=12, relief="solid", borderwidth=1
+            ).pack(pady=20)
+
+
 
     
 
