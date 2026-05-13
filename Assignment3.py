@@ -334,5 +334,59 @@ class SpotTheDifferenceApp:
         # Only the right (modified) image responds to player clicks
         self.right_canvas.bind("<Button-1>", self.check_click)
 
+
+    # Opens a file dialog and loads the selected image
+    # Resets the round and generates new differences
+    def load_image(self):
+            path = filedialog.askopenfilename(
+                filetypes=[("Image Files", "*.jpg *.png *.bmp *.jpeg")]
+            )
+            if not path:
+                return
+            self.state.reset_round()
+            self.processor.load_image(path)
+            self.processor.generate_differences()
+            self.draw_images()
+
+    # Draws both images on their canvases
+    # Also draws red circles on found differences
+    def draw_images(self):
+            original = cv2.cvtColor(self.processor.original_image, cv2.COLOR_BGR2RGB)
+            modified = cv2.cvtColor(self.processor.modified_image, cv2.COLOR_BGR2RGB)
+            max_size = 450
+            height, width = self.processor.original_image.shape[:2]
+            scale = min(max_size / width, max_size / height)
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            original = cv2.resize(original, (new_width, new_height))
+            modified = cv2.resize(modified, (new_width, new_height))
+            # Save scale factors for accurate click-to-image mapping
+            self.scale_x = width / new_width
+            self.scale_y = height / new_height
+            self.original_photo = ImageTk.PhotoImage(Image.fromarray(original))
+            self.modified_photo = ImageTk.PhotoImage(Image.fromarray(modified))
+            # Clear both canvases before redrawing
+            self.left_canvas.delete("all")
+            self.right_canvas.delete("all")
+            # Draw the original image on the left canvas
+            self.left_canvas.create_image(0, 0, anchor=tk.NW, image=self.original_photo)
+            # Draw the modified image on the right canvas
+            self.right_canvas.create_image(0, 0, anchor=tk.NW, image=self.modified_photo)
+            # Draw red ovals on both canvases for already found differences
+            for difference in self.processor.differences:
+                if difference.found():
+                    x, y, w, h = difference.rect()
+                    self.left_canvas.create_oval(
+                        x / self.scale_x, y / self.scale_y,
+                        (x + w) / self.scale_x, (y + h) / self.scale_y,
+                        outline="red", width=3
+                    )
+                    self.right_canvas.create_oval(
+                        x / self.scale_x, y / self.scale_y,
+                        (x + w) / self.scale_x, (y + h) / self.scale_y,
+                        outline="red", width=3
+                    )
+            self.update_labels()
+
     
 
