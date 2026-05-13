@@ -167,5 +167,33 @@ class ImageProcessor:
             if overlap:
                 return True
         return False
+
+    
+# GAME STATE CLASS - Tracks the player's score, mistakes, and round progress
+
+class GameState:
+    def __init__(self):
+        # Cumulative score across all rounds
+        self.total_found = 0
+        self.reset_round()
+
+    # Resets only the current round's stats (not total score)
+    def reset_round(self):
+        self.found_count = 0
+        self.mistakes = 0
+        self.game_over = False
+
+    # Returns how many differences are still unfound
+    def remaining(self):
+        return 5 - self.found_count
+
+    # Returns True if all 5 differences have been found
+    def win(self):
+        return self.found_count == 5
+
+    # Returns True if the player has exceeded mistake limit
+    def lose(self):
+        return self.game_over
+
     
 
