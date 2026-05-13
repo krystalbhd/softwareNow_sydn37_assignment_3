@@ -194,6 +194,145 @@ class GameState:
     # Returns True if the player has exceeded mistake limit
     def lose(self):
         return self.game_over
+    
+# =========================================================
+# MAIN APPLICATION — GUI SETUP
+# Builds the GUI and connects all components together
+# =========================================================
+class SpotTheDifferenceApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Spot the Difference")
+        self.root.configure(bg="#eef4f7")
+        # Handles image loading and effect generation
+        self.processor = ImageProcessor()
+        # Tracks game progress and player stats
+        self.state = GameState()
+        # Scale factors to map canvas clicks to image coordinates
+        self.scale_x = 1
+        self.scale_y = 1
+
+        # Title label at the top of the window
+        tk.Label(
+            root,
+            text="Spot the Difference",
+            bg="#eef4f7",
+            fg="black",
+            font=("Comic Sans MS", 22, "bold")
+        ).pack(pady=12)
+
+        # Frame containing the Load and Reveal buttons
+        button_frame = tk.Frame(root, bg="#eef4f7")
+        button_frame.pack(pady=5)
+
+        # Button to load a new image from file
+        tk.Button(
+            button_frame,
+            text="Load Image",
+            command=self.load_image,
+            bg="white",
+            fg="black",
+            font=("Arial", 11, "bold"),
+            width=14
+        ).pack(side=tk.LEFT, padx=10)
+
+        # Button to reveal all differences
+        tk.Button(
+            button_frame,
+            text="Reveal",
+            command=self.reveal_differences,
+            bg="white",
+            fg="black",
+            font=("Arial", 11, "bold"),
+            width=14
+        ).pack(side=tk.LEFT, padx=10)
+
+        # Label showing how many differences are remaining
+        self.remaining_label = tk.Label(
+            root,
+            text="Remaining: 0",
+            bg="#eef4f7",
+            fg="green",
+            font=("Arial", 12, "bold")
+        )
+        self.remaining_label.pack(pady=2)
+
+        # Label showing how many mistakes the player has made
+        self.mistake_label = tk.Label(
+            root,
+            text="Mistakes: 0/3",
+            bg="#eef4f7",
+            fg="red",
+            font=("Arial", 12, "bold")
+        )
+        self.mistake_label.pack(pady=2)
+
+        # Label showing the total score across all rounds
+        self.total_score_label = tk.Label(
+            root,
+            text="Total Score: 0",
+            bg="#eef4f7",
+            fg="blue",
+            font=("Arial", 12, "bold")
+        )
+        self.total_score_label.pack(pady=2)
+
+        # Frame for the Original / Modified image labels
+        label_frame = tk.Frame(root, bg="#eef4f7")
+        label_frame.pack(fill="x", pady=(5, 0))
+        label_frame.columnconfigure(0, weight=1)
+        label_frame.columnconfigure(1, weight=1)
+
+        # Label above the original image canvas
+        self.ori_label = tk.Label(
+            label_frame,
+            text="Original Image",
+            bg="#eef4f7",
+            fg="black",
+            font=("Arial", 12, "bold"),
+            width=30
+        )
+        self.ori_label.grid(row=0, column=0)
+
+        # Label above the modified image canvas
+        self.mod_label = tk.Label(
+            label_frame,
+            text="Modified Image",
+            bg="#eef4f7",
+            fg="black",
+            font=("Arial", 12, "bold"),
+            width=30
+        )
+        self.mod_label.grid(row=0, column=1)
+
+        # Frame that holds both image canvases side by side
+        image_frame = tk.Frame(root, bg="#eef4f7")
+        image_frame.pack(pady=10)
+
+        # Left canvas displays the original image (not clickable)
+        self.left_canvas = tk.Canvas(
+            image_frame,
+            width=450,
+            height=450,
+            bg="white",
+            highlightthickness=2,
+            highlightbackground="#cccccc"
+        )
+        self.left_canvas.grid(row=0, column=0, padx=12)
+
+        # Right canvas displays the modified image (clickable)
+        self.right_canvas = tk.Canvas(
+            image_frame,
+            width=450,
+            height=450,
+            bg="white",
+            highlightthickness=2,
+            highlightbackground="#cccccc"
+        )
+        self.right_canvas.grid(row=0, column=1, padx=12)
+
+        # Only the right (modified) image responds to player clicks
+        self.right_canvas.bind("<Button-1>", self.check_click)
 
     
 
