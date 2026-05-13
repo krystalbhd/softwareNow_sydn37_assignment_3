@@ -388,5 +388,68 @@ class SpotTheDifferenceApp:
                     )
             self.update_labels()
 
+    # Handles player clicks on the modified image
+    # Checks if the click lands on an unfound difference
+    def check_click(self, event):
+            # Ignore clicks if the game is already over or won
+            if self.state.lose() or self.state.win():
+                return
+            # Convert canvas coordinates to original image coordinates
+            click_x = int(event.x * self.scale_x)
+            click_y = int(event.y * self.scale_y)
+            found = False
+            # Check if the click matches any unfound difference
+            for difference in self.processor.differences:
+                if not difference.found() and difference.contains(click_x, click_y):
+                    difference.mark_found()
+                    self.state.found_count += 1
+                    self.state.total_found += 1
+                    found = True
+                    break
+            # Wrong click — increment mistake counter
+            if not found:
+                self.state.mistakes += 1
+                # End the game if 3 mistakes are made
+                if self.state.mistakes >= 3:
+                    self.state.game_over = True
+                    self.show_popup("GAME OVER ", " Too many mistakes, try again with another image ! ", "red")
+            self.draw_images()
+            # Show congratulations if all differences are found
+            if self.state.win():
+                self.show_popup("CONGRATULATIONS ", "You have found all differences !", "green")
+
+    # Reveals all differences on both canvases
+    # Found = red circle, Unfound = blue circle
+    def reveal_differences(self):
+            self.state.game_over = True
+            self.draw_images()
+            for difference in self.processor.differences:
+                x, y, w, h = difference.rect()
+                # Red for already found, blue for missed
+                color = "red" if difference.found() else "blue"
+                self.left_canvas.create_oval(
+                    x / self.scale_x, y / self.scale_y,
+                    (x + w) / self.scale_x, (y + h) / self.scale_y,
+                    outline=color, width=3
+                )
+                self.right_canvas.create_oval(
+                    x / self.scale_x, y / self.scale_y,
+                    (x + w) / self.scale_x, (y + h) / self.scale_y,
+                    outline=color, width=3
+                )
+            self.state.found_count = 5
+            self.update_labels()
+            self.show_popup("REVEALED", "All differences have been revealed!", "blue")
+
+    # Updates the remaining, mistakes, and total score labels
+    def update_labels(self):
+            self.remaining_label.config(text=f"Remaining: {self.state.remaining()}")
+            self.mistake_label.config(text=f"Mistakes: {self.state.mistakes}/3")
+            self.total_score_label.config(text=f"Total Score: {self.state.total_found}")
+
+    
+
+    
+
     
 
