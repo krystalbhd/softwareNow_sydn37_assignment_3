@@ -1,22 +1,30 @@
+# Spot the Difference Game 
+#By Group SYD37 
+# Contributed by:
+# Krystal Bhandari (S401359)
+# Shreya Khatri (S401646)
+# Nuha Fadilah Zahidy (S405350)
+# Md Shahriar Islam (S400228)
+
 import cv2
 import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import random
-# =========================================================
+
 # BASE EFFECT CLASS (POLYMORPHISM)
 # Each effect class inherits from this and overrides apply()
-# =========================================================
+
 class ImageEffect:
     def apply(self, image, x, y, w, h):
         # To be implemented by each child effect class
         raise NotImplementedError
 
-# =========================================================
+
 # EFFECT 0 - Tint Effect
 # Adds a blue tint to the selected region of the image
-# =========================================================
+
 class TintEffect(ImageEffect):
     def apply(self, image, x, y, w, h):
         # Extract the region of interest from the image
@@ -26,10 +34,10 @@ class TintEffect(ImageEffect):
         # Write the modified region back to the image
         image[y:y + h, x:x + w] = region
 
-# =========================================================
+
 # EFFECT 1 - COLOUR SHIFT
 # Adds a subtle green tint to the selected region
-# =========================================================
+
 class ColorShiftEffect(ImageEffect):
     def apply(self, image, x, y, w, h):
         # Extract the region of interest from the image
@@ -39,10 +47,10 @@ class ColorShiftEffect(ImageEffect):
         # Write the modified region back to the image
         image[y:y + h, x:x + w] = region
 
-# =========================================================
+
 # EFFECT 2 - BLUR
 # Applies Gaussian blur to the selected region
-# =========================================================
+
 class BlurEffect(ImageEffect):
     def apply(self, image, x, y, w, h):
         # Extract the region of interest from the image
@@ -52,10 +60,10 @@ class BlurEffect(ImageEffect):
         # Write the blurred region back to the image
         image[y:y + h, x:x + w] = blurred
 
-# =========================================================
+
 # EFFECT 3- INVERT Effect
 # Inverts all pixel colours in the selected region
-# =========================================================
+
 class InvertEffect(ImageEffect):
     def apply(self, image, x, y, w, h):
         # Extract the region of interest from the image
@@ -66,11 +74,10 @@ class InvertEffect(ImageEffect):
         image[y:y + h, x:x + w] = region
 
 
-# =========================================================
 # DIFFERENCE CLASS (ENCAPSULATION)
 # Represents a single difference region on the image
 # Stores position, size, effect, and whether it was found
-# =========================================================
+
 class Difference:
     def __init__(self, x, y, w, h, effect):
         # Position and size of the difference region
@@ -195,10 +202,10 @@ class GameState:
     def lose(self):
         return self.game_over
     
-# =========================================================
+
 # MAIN APPLICATION — GUI SETUP
 # Builds the GUI and connects all components together
-# =========================================================
+
 class SpotTheDifferenceApp:
     def __init__(self, root):
         self.root = root
@@ -412,7 +419,7 @@ class SpotTheDifferenceApp:
                 # End the game if 3 mistakes are made
                 if self.state.mistakes >= 3:
                     self.state.game_over = True
-                    self.show_popup("GAME OVER ", " Too many mistakes, try again with another image ! ", "red")
+                    self.show_popup("GAME OVER ", " Too many mistakes, Try again with another image ! ", "red")
             self.draw_images()
             # Show congratulations if all differences are found
             if self.state.win():
@@ -439,7 +446,7 @@ class SpotTheDifferenceApp:
                 )
             self.state.found_count = 5
             self.update_labels()
-            self.show_popup("REVEALED", "All differences have been revealed!", "blue")
+            self.show_popup("REVEALED", "Click OK to see the differences !", "blue")
 
     # Updates the remaining, mistakes, and total score labels
     def update_labels(self):
@@ -468,7 +475,7 @@ class SpotTheDifferenceApp:
                 activeforeground="black", font=("Arial", 10, "bold"),
                 width=12, relief="solid", borderwidth=1
             ).pack(pady=20)
-
+            
 # RUN APPLICATION
 # Entry point — creates the main window and starts the app
 if __name__ == "__main__":
